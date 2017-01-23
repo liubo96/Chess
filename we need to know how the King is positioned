@@ -1,0 +1,165 @@
+package MainClasses;
+
+public class Position {
+	
+	public final int startingRow;
+	public final int startingCol;
+	
+	public int row;
+	public int col;
+	
+
+	public Position(int row, int col){
+		this.row = row;
+		this.col = col;
+		
+		this.startingRow = row;
+		this.startingCol = col;
+	}
+	
+        public Position[] getAroundPositions(){
+            byte option = 0;
+            //we need to know how the King is positioned
+            if(this.col == 0){
+                option = 1;
+            }
+            if(this.col == 7){
+                option = 2;
+            }
+            if(this.row == 0){
+                option = 3;
+            }
+            if(this.row == 7){
+                option = 4;
+            }
+            if(row == 0 && col == 0){
+                option = 5;
+            }
+            if(row == 0 && col == 7){
+                option = 6;
+            }
+            if(row == 7 && col == 0){
+                option = 7;
+            }
+            if(row == 7 && col == 7){
+                option = 8;
+            }
+            if(row > 0 && row < 7 && col > 0 && col < 7){
+                option = 9;
+            }
+            
+            //here we get the surrounding (able to move to) positions for the King
+            Position[] newPosition = null;
+            switch(option){
+                case 1:{
+                    //col == 0
+                    Position[] setPosition = {calculatePosition(-1, 0), calculatePosition(1, 0),
+                                calculatePosition(-1, 1), calculatePosition(0, 1), calculatePosition(1, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 2:{
+                    // col == 7
+                    Position[] setPosition = {calculatePosition(-1, 0), calculatePosition(1, 0),
+                                       calculatePosition(-1, -1), calculatePosition(0, -1), calculatePosition(1, -1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 3:{
+                    //row == 0
+                    Position[] setPosition = {calculatePosition(0, -1), calculatePosition(0, 1),
+                                    calculatePosition(1, -1), calculatePosition(1, 0), calculatePosition(1, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 4:{
+                    //row == 7
+                    Position[] setPosition = {calculatePosition(-1, -1), calculatePosition(-1, 0), calculatePosition(-1, 1),
+                                                calculatePosition(0, 1), calculatePosition(0, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 5:{
+                    //row == 0 && col == 0
+                    Position[] setPosition = {calculatePosition(1, 0), calculatePosition(1, 1), calculatePosition(0, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 6:{
+                    //row == 0 && col == 7
+                    Position[] setPosition = {calculatePosition(1, 0), calculatePosition(1, -1), calculatePosition(0, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 7:{
+                    //row == 7 && col ==0
+                    Position[] setPosition = {calculatePosition(-1, 0), calculatePosition(-1, 1), calculatePosition(0, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 8:{
+                    //row == 7 && col == 7
+                    Position[] setPosition = {calculatePosition(0, -1), calculatePosition(-1, -1), calculatePosition(-1, 0)};
+                    newPosition = setPosition;
+                    break;
+                }
+                case 9:{
+                    //row(0;7) && col(0;7) this is a coordinations belonging
+                    Position[] setPosition = {calculatePosition(-1, -1), calculatePosition(-1, 0), calculatePosition(-1, 1),
+                                                calculatePosition(0, -1), calculatePosition(0, 1),
+                                              calculatePosition(1, 1), calculatePosition(1, 0), calculatePosition(1, 1)};
+                    newPosition = setPosition;
+                    break;
+                }
+            }
+            return newPosition;
+        }
+        public Position calculatePosition(int row, int col){
+            //as oposed to operator +
+            row = this.row + row;
+            col = this.col + col;
+            return new Position(row, col);
+        }
+        
+	@Override
+	public String toString() {
+		return "Position [row=" + row + ", col=" + col + "]";
+	}
+	
+	public boolean equals(Object obj){
+		if ( obj == null || obj == this || !(obj instanceof Position) ) 
+            return false;
+		
+		Position otherPosition = (Position) obj;
+		
+		if(otherPosition.row != this.row)		return false;
+		if(otherPosition.col != this.col)		return false;
+		
+		return true;
+	}
+
+	//getters and setters
+	public int getCol() {
+		return col;
+	}
+
+	public void setCol(int col) {
+		this.col = col;
+	}
+
+	public int getRow() {
+		return row;
+	}
+
+	public void setRow(int row) {
+		this.row = row;
+	}
+
+	public int getStartingRow() {
+		return startingRow;
+	}
+
+	public int getStartingCol() {
+		return startingCol;
+	}
+}
