@@ -1,0 +1,21 @@
+package MainClasses;
+
+import static MainClasses.ChessPlay.playableColor;
+
+public class KingCheckCalculator {
+    public Figure King;
+    Position[] dangerPosition;
+    Position position;
+
+    public KingCheckCalculator(Figure King) {
+        this.King = King;
+        position = King.getPosition();
+        dangerPosition = position.getAroundPositions();
+    }
+    
+    public boolean isSafePosition(){
+        dangerPosition = position.getAroundPositions();
+        
+        return true;
+    }
+}
