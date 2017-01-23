@@ -1,0 +1,221 @@
+package MainClasses;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+public class ChessPlay extends JFrame{
+	
+	public static InGame button[][] = new InGame[8][8];
+	public static InGame thisButton;
+	public static InGame oldButton;
+	public InGame clickedButton;
+	
+	public static Figure[] allFigure;
+	public static Color playableColor = Color.WHITE;
+	public Figure selectedFigure;
+	public static Figure playedFigure;
+	
+	
+	public Rule rule = new Rule();
+	public Container playField;
+	
+	InGame actionListener;
+	
+	public ChessPlay() {
+		super("Chess");
+		
+		setResizable(false);
+		setIconImage(getIcon());
+		
+		CreateFigure figure = new CreateFigure();
+		allFigure = figure.getAllFigures();
+		createPlayfield();
+		setGame();
+		
+		setSize(500, 500);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+	
+	public ChessPlay(Object source){
+		try{
+			checkUsedButton(source);
+		} catch(NullPointerException e){
+			JOptionPane.showMessageDialog(null, "NPE!");
+			e.printStackTrace();
+		} catch (TurnException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		}
+	}
+	
+	//the methods are (sort of) in order of use
+	public void checkUsedButton(Object source) throws NullPointerException, TurnException{
+		int i = 0;
+		int j = 0;
+		
+		while(i < button.length){
+			while(j < button.length){
+				if(source == button[i][j]){
+					clickedButton = button[i][j];
+					break;
+				}
+				++j;
+			}
+			if(clickedButton != null){
+				break;
+			}
+			j = 0;
+			++i;
+		}
+		makeMove(i, j);
+	}
+
+	public void makeMove(int i, int j) throws NullPointerException, TurnException{
+		byte option = 0;
+		if(clickedButton.getIcon() != null && selectedFigure == null){
+                    for(int n = 0; n < allFigure.length; ++n){
+                            String comparison1 = allFigure[n].getIdentity();
+                            String comparison2 = clickedButton.getActionCommand();
+				
+                            if(comparison1.equals(comparison2)){
+                            	selectedFigure = allFigure[n];
+                            	break;
+                            }
+                    }//for
+		}
+		
+		if(playedFigure != null){
+			option = 2;
+		}else if(selectedFigure != null){
+			option = 1;
+		}
+		if(selectedFigure != null && selectedFigure.getColor().equals(playableColor)){
+                    option = 1;
+                }
+		switch(option){
+		case 1: {
+                    if(selectedFigure.getColor() != playableColor){
+                    	throw new TurnException();
+                    }
+                    playedFigure = selectedFigure;
+                    oldButton = clickedButton;
+                    selectedFigure = null;
+                    clickedButton = null;
+                    break;
+		}
+		case 2: {
+                    selectedFigure = null;
+                    thisButton = clickedButton;
+			
+                    if(rule.isFigureBetween(i, j)){
+			return;
+                    }
+			
+                    //if the player hasn't moved a figure the game doesn't switch turns
+                    if(!playFigure(i, j)){
+			return;
+                    }
+			
+                    rule.changePlayerColor();
+                    rule.isKingCheck();
+			
+                    oldButton = null;
+                    thisButton = null;
+                    playedFigure = null;
+                    break;
+		}
+		}
+	}
+	
+	public boolean playFigure(int i, int j) throws NullPointerException{
+		boolean move = rule.isValidMove(i ,j, thisButton);
+
+		if(move == true){
+			Position position = playedFigure.getPosition();
+			
+			thisButton.setIcon(resizeIcon(playedFigure.getSymbol()));
+			thisButton.setActionCommand(playedFigure.getIdentity());
+			//throws NPE when you click a false move and then a true one
+                        //oldButton == null
+                        oldButton.setIcon(null);
+			oldButton.setActionCommand(null);
+			
+			position.setRow(i);
+			position.setCol(j);
+                        return true;
+		}
+                return false;
+	}
+	
+	//resizes the figure's image(icon) to fit the buttons
+	public ImageIcon resizeIcon(ImageIcon icon){
+		Image image = icon.getImage();
+		Image newImage = image.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
+		icon = new ImageIcon(newImage);
+	
+		return icon;
+	}
+
+	//Icon
+	public Image getIcon(){
+		ImageIcon imageIcon = new ImageIcon("F:\\Java\\Programi\\Chess\\Photos\\ChessIcon.jpg");
+		Image icon = imageIcon.getImage();
+		return icon;
+	}
+	
+	//sets up the game for start
+	public void setGame(){
+		Board board = new Board();
+		String buttonName[][] = board.getTable();
+		
+		int p = 0;
+		for(int i = 0; i < 8; ++i){
+			for(int j = 0; j < 8; ++j){
+				button[i][j].setName(buttonName[i][j]);
+				if(i <= 1 || i >= 6){
+					button[i][j].setIcon(resizeIcon(allFigure[p].getSymbol()));
+					button[i][j].setActionCommand(allFigure[p].getIdentity());
+					++p;
+				}
+			}
+		}
+	}
+	
+	//creates the playfield
+	public void createPlayfield(){
+		
+		playField = getContentPane();
+		playField.setLayout(new GridLayout(8, 8));
+		actionListener = new InGame();
+		
+		int temp = 0;
+		int comparison = 8;
+		for(int i = 0; i < 8; ++i){
+			for(int j = 0; j < 8; ++j){
+				button[i][j] = new InGame();
+				
+				if(temp == comparison){
+					temp++;
+					comparison += 9;
+				}
+				if(temp%2 == 1){
+					button[i][j].setBackground(Color.BLACK);
+				}else if(temp%2 == 0){
+					button[i][j].setBackground(Color.WHITE);
+				}
+				
+				playField.add(button[i][j]);
+				button[i][j].addActionListener(actionListener);
+				++temp;
+			}//for
+		}//for
+	}
+}
