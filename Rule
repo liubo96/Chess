@@ -1,0 +1,294 @@
+package MainClasses;
+
+import static MainClasses.ChessPlay.allFigure;
+import static MainClasses.ChessPlay.button;
+import static MainClasses.ChessPlay.playableColor;
+import static MainClasses.ChessPlay.playedFigure;
+import java.awt.Color;
+import javax.swing.JOptionPane;
+
+public class Rule{
+	public Figure king;
+	public Figure queen;
+	public Figure rook;
+	public Figure knight;
+	public Figure bishop;
+	public Figure pawn;
+	
+	
+	//the figures move/position, needed for the lower methods
+	public MovesCalculator move;
+	public Position position;
+	
+	boolean canTake;
+	
+	public int colDiff;
+	public int rowDiff;
+	
+	public boolean isValidMove(int i, int j, InGame button){
+            //this is a different thisButton. Use it 
+		boolean move = false;
+		canTake = taking(playedFigure, button);
+		
+		if(!canTake){
+			return false;
+		}
+		
+		String name = playedFigure.getName();
+		
+		switch(name.substring(6, name.length())){
+		case "king":{
+			king = playedFigure;
+                        KingCheckCalculator calculator = new KingCheckCalculator(king);
+                        if(calculator.isSafePosition()){
+                            move = toMoveKing(i, j);
+                        } else{
+                            move = false;
+                        }
+			break;
+		}
+		case "queen":{
+			queen = playedFigure;
+			move = toMoveQueen(i, j);
+			break;
+		}
+		case "rook":{
+			rook = playedFigure;
+			move = toMoveRook(i, j);
+			break;
+		}
+		case "knight":{
+			knight = playedFigure;
+			move = toMoveKnight(i, j);
+			break;
+		}
+		case "bishop":{
+			bishop = playedFigure;
+			move = toMoveBishop(i, j);
+			break;
+		}
+		case "pawn":{
+			pawn = playedFigure;
+			move = toMovePawn(i, j, button);
+			break;
+		}
+		default:
+			
+		}
+		return move;
+	}
+        
+	public void isKingCheck(){
+		Figure King = null;
+		if(allFigure[28].getColor().equals(playableColor)){
+			King = allFigure[28];
+		} else if(allFigure[4].getColor().equals(playableColor)){
+			King = allFigure[4];
+		}
+		
+		int row = King.getPosition().getRow();
+		int col = King.getPosition().getCol();
+		
+		boolean clearWay = isFigureBetween(row, col);
+		boolean canMoveThere = isValidMove(row, col, button[row][col]);	
+		
+		if(!clearWay && canMoveThere){
+			String message = King.getName().substring(0, 5);
+			button[row][col].setBackground(Color.RED);
+			JOptionPane.showMessageDialog(null, message + " king is check.");
+		}
+	}
+	
+	//checks if there is a figure between the played figure and the given go-to command
+	public boolean isFigureBetween(int i, int j) throws NullPointerException{
+		Position position = playedFigure.getPosition();
+		byte move = 0;
+		
+		int rowDiff = Math.abs(i - position.getRow());
+		int colDiff = Math.abs(j - position.getCol());
+		
+		if(rowDiff == colDiff){
+			move = 1;
+		}
+		else if(rowDiff != 0 && colDiff == 0){
+			move = 2;
+		}
+		else if(rowDiff == 0 && colDiff != 0){
+			move = 3;
+		}
+		
+		
+		int r = position.getRow();
+		int c = position.getCol();
+		if(r > i){				//if the number of the position
+			int temp = r;		// is higher than i or j, it switches them
+			r = i;
+			i = temp;
+		}
+		if(c > j){
+			int temp = c;
+			c = j;
+			j = temp;
+		}
+                
+		switch(move){
+		case 0: {
+			break;
+		}
+		case 1: {
+			++r;
+			++c;
+			while(r < i){
+				if(button[r][c].getIcon() != null){
+					return true;
+				}
+				++r;
+				++c;
+			}
+		}
+		case 2:{
+			++r;
+			while(r < i){
+				if(button[r][c].getIcon() != null){
+					return true;
+				}
+				++r;
+			}
+		}
+		case 3:{
+			++c;
+			while(c < j){
+				if(button[r][c].getIcon() != null){
+					return true;
+				}
+				++c;
+			}
+		}
+		}
+		return false;
+	}
+        
+	public boolean taking(Figure playedFigure, InGame button){
+		char figureColor = playedFigure.getIdentity().charAt(0);
+		
+		if(button.getIcon() != null && figureColor == button.getActionCommand().charAt(0)){
+			return false;
+		}
+		return true;
+	}
+	
+	//cheching if you can move the according figure
+
+	//Casting
+	public boolean casting(){
+		
+		return true;
+	}
+	
+        	//changes the in turn color
+	public void changePlayerColor(){
+		if(playedFigure.getColor().equals(Color.WHITE)){
+			playableColor = Color.BLACK;
+		}
+		else if(playedFigure.getColor().equals(Color.BLACK)){
+			playableColor = Color.WHITE;
+		}
+	}
+        
+	public boolean toMoveKing(int i, int j){
+		move = king.getMove();
+		position = king.getPosition();
+		
+		rowDiff = Math.abs(i - position.getRow());
+		colDiff = Math.abs(j - position.getCol());
+		
+		if((rowDiff == move.getMoveHorizintally() && colDiff == move.getMoveUpright())
+				|| (rowDiff == move.getMoveUpright() && colDiff == move.getMoveHorizintally())
+				|| (rowDiff == colDiff && rowDiff == move.getMoveUpright())){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean toMoveQueen(int i, int j){
+		position = queen.getPosition();
+		
+		rowDiff = Math.abs(i - position.getRow());
+		colDiff = Math.abs(j - position.getCol());
+		
+		if(rowDiff == colDiff && rowDiff != 0){
+			return true;
+		}
+		if(rowDiff != 0 && colDiff == 0){
+			return true;
+		}
+		if(colDiff != 0 && rowDiff == 0){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean toMoveRook(int i, int j){
+		position = rook.getPosition();
+
+		rowDiff = Math.abs(i - position.getRow());
+		colDiff = Math.abs(j - position.getCol());
+		
+		if((rowDiff != 0 && colDiff == 0) 
+				|| (rowDiff == 0 && colDiff != 0)){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean toMoveKnight(int i, int j){
+		move = knight.getMove();
+		position = knight.getPosition();
+		
+		rowDiff = Math.abs(i - position.getRow());
+		colDiff = Math.abs(j - position.getCol());
+		
+		if((rowDiff == move.getMoveHorizintally() && colDiff == move.getMoveUpright())
+				|| (rowDiff == move.getMoveUpright() && colDiff == move.getMoveHorizintally())){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean toMoveBishop(int i, int j){
+		position = bishop.getPosition();
+		
+		rowDiff = Math.abs(i - position.getRow());
+		colDiff = Math.abs(j - position.getCol());
+		
+		if(rowDiff == colDiff && rowDiff != 0){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean toMovePawn(int i, int j, InGame button){
+		move = pawn.getMove();
+		position = pawn.getPosition();
+		Position startPosition = new Position(position.getStartingRow(), position.getStartingCol());
+		
+		rowDiff = i - position.getRow();
+		colDiff = j - position.getCol();
+		
+		if(((rowDiff == -1 && colDiff == 0) || (rowDiff == -2 && colDiff == 0 && position.equals(startPosition))) && button.getIcon() == null && pawn.getColor().equals(Color.WHITE)){
+			return true;
+		}
+		if(((rowDiff == 1 && colDiff == 0) || (rowDiff == 2 && colDiff == 0 && position.equals(startPosition))) && button.getIcon() == null && pawn.getColor().equals(Color.BLACK)){
+			return true;
+		}
+		//this is for the diagonal taking of the pawn
+		//line 189 - black pawn
+		//line 190 - white pawn
+		if((rowDiff == -1 && Math.abs(rowDiff) == Math.abs(colDiff) && canTake == true && button.getIcon() != null && pawn.getColor().equals(Color.WHITE))
+				|| (rowDiff == 1 && Math.abs(rowDiff) == Math.abs(colDiff) && canTake == true && button.getIcon() != null && pawn.getColor().equals(Color.BLACK))){
+			
+			return true;
+		}
+		return false;
+	}
+}
