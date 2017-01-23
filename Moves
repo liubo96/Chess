@@ -1,0 +1,32 @@
+package MainClasses;
+
+public class MovesCalculator{
+	//the variables make set the possible moves for a figure
+	public int moveUpright;
+	public int moveHorizintally;
+	
+	
+	public MovesCalculator(int moveUpright, int moveHorizintally){
+		this.moveUpright = moveUpright;
+		this.moveHorizintally = moveHorizintally;
+		
+	}
+
+	//getters and setters
+
+	public int getMoveUpright() {
+		return moveUpright;
+	}
+
+	public void setMoveUpright(int moveUpright) {
+		this.moveUpright = moveUpright;
+	}
+
+	public int getMoveHorizintally() {
+		return moveHorizintally;
+	}
+
+	public void setMoveHorizintally(int oveHorizintally) {
+		this.moveHorizintally = oveHorizintally;
+	}
+}
