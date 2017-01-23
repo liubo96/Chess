@@ -1,0 +1,74 @@
+package MainClasses;
+
+import java.awt.Color;
+
+import javax.swing.ImageIcon;
+
+public class Figure {
+	public String name;
+	public String identity;
+	public Position position;
+	public MovesCalculator move;
+	public ImageIcon symbol;
+	public Color color;
+	
+	public Figure(String name, String identity, Position position, MovesCalculator moves, ImageIcon symbol, Color color){
+		this.name = name;
+		this.identity = identity;
+		this.position = position;
+		this.move = moves;
+		this.symbol = symbol;
+		this.color = color;
+	}
+
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public ImageIcon getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(ImageIcon symbol) {
+		this.symbol = symbol;
+	}
+
+	public String getIdentity() {
+		return identity;
+	}
+
+
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+
+
+	public MovesCalculator getMove() {
+		return move;
+	}
+
+	public void setMove(MovesCalculator move) {
+		this.move = move;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Position getPosition() {
+		return position;
+	}
+
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}
